@@ -16,7 +16,7 @@ public sealed class WordFilter
             {
                 _instance = new WordFilter();
             }
-            return instance;
+            return _instance;
         }
     } 
 

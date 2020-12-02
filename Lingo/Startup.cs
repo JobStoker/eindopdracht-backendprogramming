@@ -22,7 +22,7 @@ namespace Lingo
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // This method gets called by the runtime.  .
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
@@ -44,8 +44,9 @@ namespace Lingo
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllerRoute("Default", "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }
