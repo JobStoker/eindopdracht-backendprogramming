@@ -6,15 +6,15 @@ public sealed class WordFilter
     /// <summary>
     /// Singleton for WordFilter
     /// </summary>
-	private static WordFilter instance = null;
+	private static WordFilter _instance = null;
 
     public static WordFilter Instance
     {
         get
         {
-            if (instance == null)
+            if (_instance == null)
             {
-                instance = new WordFilter();
+                _instance = new WordFilter();
             }
             return instance;
         }
