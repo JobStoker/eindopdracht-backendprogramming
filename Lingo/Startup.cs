@@ -1,7 +1,10 @@
+using Lingo.Models;
+using Lingo.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Lingo
 {
@@ -25,7 +29,12 @@ namespace Lingo
         // This method gets called by the runtime.  .
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
+            services.AddScoped(provider => new lingoContext());
+            services.AddScoped<IGameRepository, GameRepository>();
+            services.AddScoped<IWordRepository, WordRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

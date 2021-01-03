@@ -1,158 +1,71 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Lingo.Models;
 using Microsoft.Extensions.Logging;
+using Lingo.Repositories;
+
 
 namespace Lingo.Controllers
 {
-    [ApiController]
-    [Route("[controller]")] 
     public class GamesController : Controller
     {
 
         private readonly ILogger<GamesController> _logger;
-        private readonly lingoContext _context;
+        private readonly IGameRepository _repository;
 
-        public GamesController(lingoContext context, ILogger<GamesController> logger)
+        public GamesController(IGameRepository repository, ILogger<GamesController> logger)
         {
-            _context = context;
+            _repository = repository;
             _logger = logger;
         }
 
-        // GET: Games
-        public async Task<IActionResult> Index()
+        public JsonResult Games(int id)
         {
-            return View(await _context.Games.ToListAsync());
-        }
+            var result = Json(_repository.GetGame(id));
 
-        // GET: Games/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+            if (result == null)
             {
-                return NotFound();
+                _logger.LogInformation("Repository returned Null for: Game");
+                return null;
             }
 
-            var game = await _context.Games
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (game == null)
-            {
-                return NotFound();
-            }
-
-            return View(game);
+            return result;
         }
 
-        // GET: Games/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Games/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,AuthToken,EndTime,BeginTime")] Game game)
+        public JsonResult Create([FromBody] Game game)
         {
-            if (ModelState.IsValid)
-            {   
-                _context.Add(game);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(game);
+            var result = Json(_repository.CreateGame(game));
+
+            return result;
         }
 
-        // GET: Games/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var game = await _context.Games.FindAsync(id);
-            if (game == null)
-            {
-                return NotFound();
-            }
-            return View(game);
-        }
-
-        // POST: Games/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,AuthToken,EndTime,BeginTime")] Game game)
+        public JsonResult Round([FromBody] Round round)
         {
-            if (id != game.Id)
+            var result = Json(_repository.CreateRound(round));
+
+            if (result == null)
             {
-                return NotFound();
+                _logger.LogInformation("Repository returned Null for: Round");
+                return null;
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(game);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!GameExists(game.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(game);
+            return result;
         }
 
-        // GET: Games/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        [HttpPost]
+        public JsonResult Turn([FromBody] Turn turn)
         {
-            if (id == null)
+            var result = Json(_repository.NewTurn(turn)); 
+
+            if(result == null)
             {
-                return NotFound();
+                _logger.LogInformation("Repository returned Null for: Turn");
+                return null;
             }
 
-            var game = await _context.Games
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (game == null)
-            {
-                return NotFound();
-            }
-
-            return View(game);
-        }
-
-        // POST: Games/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var game = await _context.Games.FindAsync(id);
-            _context.Games.Remove(game);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool GameExists(int id)
-        {
-            return _context.Games.Any(e => e.Id == id);
+            return result;    
         }
     }
 }

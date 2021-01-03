@@ -9,16 +9,22 @@ namespace Lingo.Models
     {
         public Game()
         {
-            GameWords = new HashSet<GameWord>();
-            Scores = new HashSet<Score>();
+            Rounds = new HashSet<Round>();
         }
 
         public int Id { get; set; }
         public string AuthToken { get; set; }
-        public DateTime EndTime { get; set; }
-        public DateTime BeginTime { get; set; }
+        public string Username { get; set; }
+        public virtual ICollection<Round> Rounds { get; set; }
 
-        public virtual ICollection<GameWord> GameWords { get; set; }
-        public virtual ICollection<Score> Scores { get; set; }
+        /// <summary>
+        /// Returns if a word needs to be 5 / 6 or 7 letters using the modulo operator.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <returns></returns>
+        public int GetWordLengthFromRound(int rounds)
+        {
+            return rounds % 3 == 0 ? 7 : rounds % 3 + 4;
+        }
     }
 }
